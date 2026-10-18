@@ -412,7 +412,7 @@ using UnityEngine;
             else if (ch == 3 && !ch3Done) { ch3Done = true; GameManager.Instance.AddBossClearReward(bossClearRewardCoin); GameManager.Instance.CompleteAllBossChapters(); }
         }
 
-        void AbortAll()
+        void AbortAll(bool cleared, string quotaMsg, int rew, int settled, int totalSaved)
         {
             IsBossBattleActive = false;
             if (masterCo != null) StopCoroutine(masterCo);
