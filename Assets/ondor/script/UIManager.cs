@@ -54,28 +54,24 @@ public class UIManager : MonoBehaviour
 
     // ==================== 기본 버튼 기능 ====================
 
-    // [시작] 버튼 -> playe 씬으로 이동
     public void OnClickStart()
     {
         Time.timeScale = 1f;
         SceneManager.LoadScene(gameSceneName);
     }
 
-    // [설정] 버튼 -> 설정창 켜기/끄기
     public void OnClickSettings()
     {
         if (settingsPanel != null)
             settingsPanel.SetActive(!settingsPanel.activeSelf);
     }
 
-    // [되돌아가기] 버튼 -> 설정창 닫기
     public void OnClickCloseSettings()
     {
         if (settingsPanel != null)
             settingsPanel.SetActive(false);
     }
 
-    // [게임종료] 버튼 -> 게임 종료
     public void OnClickQuit()
     {
 #if UNITY_EDITOR
@@ -101,20 +97,17 @@ public class UIManager : MonoBehaviour
         ChangeButtonTextOrChild(targetText, isSfxOn, "Musec_j_on", "Musec_j_off");
     }
 
-    // 버튼 안의 텍스트를 강제로 바꾸거나, on/off 자식 오브젝트를 자동으로 전환
     private void ChangeButtonTextOrChild(string newText, bool isOn, string onObjName, string offObjName)
     {
         GameObject clickedBtn = EventSystem.current.currentSelectedGameObject;
         if (clickedBtn == null) return;
 
-        // 1. 일반 Text 컴포넌트가 있으면 글자 강제 변경
         Text uiText = clickedBtn.GetComponentInChildren<Text>(true);
         if (uiText != null)
         {
             uiText.text = newText;
         }
 
-        // 2. TextMeshPro 등 다른 텍스트 컴포넌트를 리플렉션으로 찾아 글자 강제 변경 (using TMPro 없이 작동)
         Component[] allComponents = clickedBtn.GetComponentsInChildren<Component>(true);
         foreach (Component comp in allComponents)
         {
@@ -125,7 +118,6 @@ public class UIManager : MonoBehaviour
             }
         }
 
-        // 3. 만약 버튼 자식으로 Music_on / Music_off 오브젝트가 나뉘어 있다면 켜기/끄기 전환
         Transform onChild = clickedBtn.transform.Find(onObjName);
         Transform offChild = clickedBtn.transform.Find(offObjName);
         if (onChild != null && offChild != null)

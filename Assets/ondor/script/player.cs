@@ -1,15 +1,22 @@
 using UnityEngine;
-#if ENABLE_INPUT_SYSTEM
-using UnityEngine.InputSystem;
-#endif
 
-public class PlayerController : MonoBehaviour
+public class player : MonoBehaviour
 {
     [Header("이동 및 점프 설정")]
-    public float forwardSpeed = 8f;   // 앞으로 달리는 속도
+    // forwardSpeed 변수는 전진하지 않으므로 제거했습니다.
     public float sideSpeed = 6f;      // 좌우 이동 속도
     public float xLimit = 4.5f;       // 좌우 도로 이탈 방지 범위
     public float jumpForce = 6f;      // 점프 힘
+
+    // 보스 공격 판정(회피)을 위한 필수 속성
+    public bool IsJumping { get; private set; }
+    public bool IsSliding { get; private set; }
+
+    private Collider col;
+    public Bounds ColliderBounds
+    {
+        get { return col != null ? col.bounds : new Bounds(); }
+    }
 
     private Rigidbody rb;
     private bool isGrounded = true;
@@ -17,47 +24,43 @@ public class PlayerController : MonoBehaviour
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
+        col = GetComponent<Collider>();
     }
 
     private void Start()
     {
-        // 씬 시작 시 멈춤 방지
         Time.timeScale = 1f;
     }
 
     private void Update()
     {
-        // GameManager가 있고 게임오버 상태일 때만 멈춤 (GameManager가 없어도 움직임)
-        if (GameManager.Instance != null && !GameManager.Instance.isPlaying)
+        if (GameManager.Instance != null && (!GameManager.Instance.isPlaying || GameManager.Instance.isGameEnded))
             return;
 
-        // 1. 좌우 입력 받기 (신버전 InputSystem & 기본 Input 동시 지원)
-        float moveX = 0f;
+        // 1. 좌우 입력 받기
+        float moveX = Input.GetAxisRaw("Horizontal");
 
-#if ENABLE_INPUT_SYSTEM
-        if (Keyboard.current != null)
-        {
-            if (Keyboard.current.aKey.isPressed || Keyboard.current.leftArrowKey.isPressed) moveX = -1f;
-            if (Keyboard.current.dKey.isPressed || Keyboard.current.rightArrowKey.isPressed) moveX = 1f;
-
-            if (Keyboard.current.spaceKey.wasPressedThisFrame && isGrounded)
-            {
-                Jump();
-            }
-        }
-#else
-        moveX = Input.GetAxisRaw("Horizontal");
+        // 2. 점프
         if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
         {
             Jump();
         }
-#endif
 
-        // 2. 앞으로 전진 + 좌우 이동
-        Vector3 move = Vector3.forward * forwardSpeed + Vector3.right * (moveX * sideSpeed);
+        // 3. 슬라이딩 (아래 화살표를 누르고 있는 동안)
+        if (Input.GetKeyDown(KeyCode.DownArrow) && isGrounded)
+        {
+            IsSliding = true;
+        }
+        if (Input.GetKeyUp(KeyCode.DownArrow))
+        {
+            IsSliding = false;
+        }
+
+        // 4. 전진 코드를 없애고 좌우 이동만 적용
+        Vector3 move = Vector3.right * (moveX * sideSpeed);
         transform.Translate(move * Time.deltaTime, Space.World);
 
-        // 3. 도로 밖으로 나가지 않게 X좌표 제한
+        // 5. 도로 밖으로 나가지 않게 X좌표 제한
         Vector3 pos = transform.position;
         pos.x = Mathf.Clamp(pos.x, -xLimit, xLimit);
         transform.position = pos;
@@ -68,6 +71,7 @@ public class PlayerController : MonoBehaviour
         if (rb != null)
         {
             isGrounded = false;
+            IsJumping = true; // 점프 상태 켜기
             rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
         }
     }
@@ -75,6 +79,7 @@ public class PlayerController : MonoBehaviour
     private void OnCollisionEnter(Collision collision)
     {
         isGrounded = true;
+        IsJumping = false; // 땅에 닿으면 점프 상태 끄기
 
         if (collision.gameObject.CompareTag("Obstacle"))
         {

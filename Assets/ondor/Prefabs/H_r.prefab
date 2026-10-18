@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 4379501545796752117}
   m_Layer: 0
   m_Name: H_r
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -97,10 +97,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: ondor::ondor.Obstacle
   type: 1
   speed: 5
-  health: 1
-  lowAsset: {fileID: 919132149155446097, guid: 40f363494a570b34e8d8e9d0ed9e3514, type: 3}
-  highRAsset: {fileID: 919132149155446097, guid: b2fcfd84a230e884b9455f7532c4b1c1, type: 3}
-  highLAsset: {fileID: 919132149155446097, guid: 7ad5970476a589a43b7c3b23ba7bb071, type: 3}
 --- !u!1001 &6849562416565574977
 PrefabInstance:
   m_ObjectHideFlags: 0

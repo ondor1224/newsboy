@@ -245,11 +245,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 9aa2e06ea9dc96b42ba5cc7e22ef2701, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 0.4
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 9aa2e06ea9dc96b42ba5cc7e22ef2701, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 9aa2e06ea9dc96b42ba5cc7e22ef2701, type: 3}
       propertyPath: m_LocalRotation.w
@@ -379,7 +379,7 @@ Transform:
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
   m_LocalRotation: {x: 0.043619405, y: 0, z: 0, w: 0.9990483}
-  m_LocalPosition: {x: 0, y: 4.5, z: -10}
+  m_LocalPosition: {x: 0, y: 10.1, z: -38.56}
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -747,6 +747,66 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1505549817
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1505549819}
+  - component: {fileID: 1505549818}
+  m_Layer: 0
+  m_Name: Spawner
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1505549818
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1505549817}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f766ff41228631247bee6361914b8039, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ondor::IntegratedSpawner
+  obstaclePrefabs:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  customerPrefabs: []
+  itemPrefabs: []
+  obstacleSpawnInterval: 2
+  customerSpawnInterval: 3.5
+  itemSpawnInterval: 1.5
+  spawnZ: 20
+  laneX:
+  - -2.5
+  - 0
+  - 2.5
+  isObstacleSpawnPaused: 0
+  isCustomerSpawnEnabled: 1
+--- !u!4 &1505549819
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1505549817}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1581536849
 GameObject:
   m_ObjectHideFlags: 0
@@ -776,49 +836,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4df239c78d11ebc4abfca8891b531850, type: 3}
   m_Name: 
   m_EditorClassIdentifier: ondor::GameManager
-  playerRef: {fileID: 0}
-  obstaclePrefab: {fileID: 0}
-  leftCustomerPrefab: {fileID: 0}
-  rightCustomerPrefab: {fileID: 0}
-  spawnZ: 28
-  laneX:
-  - -2.5
-  - 0
-  - 2.5
-  customerX: 4.5
-  baseObstacleInterval: 2.2
-  customerInterval: 2.8
-  titlePanel: {fileID: 0}
-  settingsPanel: {fileID: 0}
-  lobbyPanel: {fileID: 0}
-  shopPanel: {fileID: 0}
-  hudPanel: {fileID: 0}
-  resultPanel: {fileID: 0}
-  hudCoinText: {fileID: 0}
-  hudShieldText: {fileID: 0}
-  lobbySavedCoinText: {fileID: 0}
-  shopStatusText: {fileID: 0}
-  resultSummaryText: {fileID: 0}
-  bgmSlider: {fileID: 0}
-  sfxSlider: {fileID: 0}
-  bgmSource: {fileID: 0}
-  sfxSource: {fileID: 0}
-  hitClip: {fileID: 0}
-  coinClip: {fileID: 0}
-  clickClip: {fileID: 0}
-  currentCoin: 0
-  chapterProgressCoin: 0
-  totalSavedCoin: 0
-  basicHitPenalty: 10
-  bossHitPenalty: 15
-  dailyQuota: 1500
-  baseUpgradeCost: 100
   isPlaying: 0
   isGameEnded: 0
-  shieldLv: 0
-  lifeLv: 0
-  autoCustomerLv: 0
-  doubleCoinLv: 0
+  currentCoins: 0
+  shieldCount: 0
+  playerRef: {fileID: 0}
 --- !u!4 &1581536851
 Transform:
   m_ObjectHideFlags: 0
@@ -1101,8 +1123,8 @@ GameObject:
   m_Component:
   - component: {fileID: 2045933171}
   - component: {fileID: 2045933173}
-  - component: {fileID: 2045933174}
   - component: {fileID: 2045933175}
+  - component: {fileID: 2045933176}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -1119,7 +1141,7 @@ Transform:
   m_GameObject: {fileID: 2045933170}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: -22.92}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1153,7 +1175,22 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 120
   m_CollisionDetection: 1
---- !u!65 &2045933174
+--- !u!114 &2045933175
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2045933170}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0f19f6aa20eb96149bfacb433ddae470, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ondor::ondor.player
+  sideSpeed: 6
+  xLimit: 4.5
+  jumpForce: 6
+--- !u!65 &2045933176
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1172,25 +1209,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 1, z: 0}
---- !u!114 &2045933175
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2045933170}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0f19f6aa20eb96149bfacb433ddae470, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: ondor::ondor.player
-  speed: 10
-  jumpPower: 10
-  limitX: 3.5
-  slideDuration: 0.6
-  slideHeightRatio: 0.45
+  m_Size: {x: 2.3, y: 3.5, z: 1}
+  m_Center: {x: 0, y: 2.45, z: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -1205,3 +1225,4 @@ SceneRoots:
   - {fileID: 532713461}
   - {fileID: 1581536851}
   - {fileID: 1105688913}
+  - {fileID: 1505549819}
