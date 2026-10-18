@@ -8,14 +8,13 @@ public class GameManager : MonoBehaviour
 
     [Header("게임 진행 상태")]
     public bool isPlaying = false;
-    public bool isGameEnded = false; // BossBattleManager 연동용
+    public bool isGameEnded = false;
     public int currentCoins = 0;
     public int shieldCount = 0;
 
     [Header("참조 변수")]
     public player playerRef;
 
-    // BossBattleManager가 구독(Subscribe)하는 이벤트 파라미터 매칭
     public event Action<int, int> OnCoinUpdated;
     public event Action<bool, string, int, int, int> OnGameEndedTriggered;
 
@@ -53,7 +52,6 @@ public class GameManager : MonoBehaviour
             UIManager.Instance.UpdateHudUI(currentCoins, shieldCount);
         }
 
-        // 코인을 먹을 때마다 보스전 매니저에게 코인 획득 상황 전달
         OnCoinUpdated?.Invoke(currentCoins, currentCoins);
     }
 
@@ -90,8 +88,17 @@ public class GameManager : MonoBehaviour
         isPlaying = false;
         isGameEnded = true;
 
-        // 게임 오버 시 이벤트 발생
+        // ★ 게임오버 SFX 및 BGM 전환 연동
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlayGameOverSound();
+            AudioManager.Instance.PlayBGM(AudioManager.Instance.endingBGM);
+        }
+
         OnGameEndedTriggered?.Invoke(false, "Game Over", 0, 0, 0);
+
+        PlayerPrefs.SetInt("FinalCoin", currentCoins);
+        PlayerPrefs.Save();
 
         if (UIManager.Instance != null && UIManager.Instance.resultPanel != null)
         {
@@ -104,14 +111,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    // =========================================================
-    // BossBattleManager에서 발생하는 에러 방지용 연동 함수들
-    // =========================================================
-
-    // =========================================================
-    // BossBattleManager에서 호출하는 스포너 제어 함수
-    // =========================================================
-
+    // BossBattleManager 연동 더미 함수들
     public void SetCustomerSpawnEnabled(bool isEnabled, bool arg2)
     {
         if (IntegratedSpawner.Instance != null)
@@ -124,7 +124,6 @@ public class GameManager : MonoBehaviour
             IntegratedSpawner.Instance.isObstacleSpawnPaused = isPaused;
     }
 
-    // 나머지 더미 함수들
     public void DeductBossHit(int damage = 0) { }
     public void DeductBasicHit(int damage = 0) { }
     public void AddBossClearReward(int rewardAmount) { }

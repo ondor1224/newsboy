@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 9aa2e06ea9dc96b42ba5cc7e22ef2701
+guid: 69a900e7eaf7cf74684bdbeee2c80094
 ModelImporter:
   serializedVersion: 24501
   internalIDToNameTable: []
@@ -13,37 +13,37 @@ ModelImporter:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: "\uBA38\uD2F0\uB9AC\uC5BC.001"
-    second: {fileID: 2100000, guid: 0e594166b0001f44f8b53b00afd4e020, type: 2}
+    second: {fileID: 2100000, guid: 03ae3f883e35d534c8341fb038ca0810, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: "\uBA38\uD2F0\uB9AC\uC5BC.002"
-    second: {fileID: 2100000, guid: e1a61029f4cc42b4290cc846f650d461, type: 2}
+    second: {fileID: 2100000, guid: ffa10c60cb357894f9117f883909b3db, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: "\uBA38\uD2F0\uB9AC\uC5BC.003"
-    second: {fileID: 2100000, guid: aa5dfe2e10fb9b0408dda5de267e74dd, type: 2}
+    second: {fileID: 2100000, guid: 7578a404af1ec6643ac3e7c8fee71521, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: "\uBA38\uD2F0\uB9AC\uC5BC.006"
-    second: {fileID: 2100000, guid: 0fa6513f5148dfd4ca52353295cd5e9e, type: 2}
+    second: {fileID: 2100000, guid: 19d7c97f7261d4e4fa757b6f13a78448, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: "\uBA38\uD2F0\uB9AC\uC5BC.007"
-    second: {fileID: 2100000, guid: 9f694e8d997fa3c49a1194146d11497b, type: 2}
+    second: {fileID: 2100000, guid: 134fee87e53c33d4c94af4a64e86cc56, type: 2}
   - first:
       type: UnityEngine:Texture2D
       assembly: UnityEngine.CoreModule
       name: Gemini_Generated_Image_tl8aaitl8aaitl8a
-    second: {fileID: 2800000, guid: 3be3bbe75fd99f64d89e4019908a1b3b, type: 3}
+    second: {fileID: 2800000, guid: a3aaf741da793ba4cba22a5ca33a04a0, type: 3}
   - first:
       type: UnityEngine:Texture2D
       assembly: UnityEngine.CoreModule
       name: Gemini_Generated_Image_uemv4ouemv4ouemv
-    second: {fileID: 2800000, guid: 5172d67c69c6f8a4cbac04de1664b16a, type: 3}
+    second: {fileID: 2800000, guid: a3c39f21545083947a6a6239dbac5cc7, type: 3}
   materials:
     materialImportMode: 2
     materialName: 0

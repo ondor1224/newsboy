@@ -9,6 +9,7 @@ TagManager:
   - Kill
   - obstacle
   - Obstacle
+  - Coin
   layers:
   - Default
   - TransparentFX

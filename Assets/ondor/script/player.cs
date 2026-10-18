@@ -2,34 +2,59 @@ using UnityEngine;
 
 public class player : MonoBehaviour
 {
-    [Header("¿Ãµø π◊ ¡°«¡ º≥¡§")]
-    // forwardSpeed ∫Øºˆ¥¬ ¿¸¡¯«œ¡ˆ æ ¿∏π«∑Œ ¡¶∞≈«ﬂΩ¿¥œ¥Ÿ.
-    public float sideSpeed = 6f;      // ¡¬øÏ ¿Ãµø º”µµ
-    public float xLimit = 4.5f;       // ¡¬øÏ µµ∑Œ ¿Ã≈ª πÊ¡ˆ π¸¿ß
-    public float jumpForce = 6f;      // ¡°«¡ »˚
+    [Header("Ï∞®ÏÑ† ÎåÄÏâ¨ Ïù¥Îèô ÏÑ§Ï†ï (-5, 0, 5)")]
+    public float laneDistance = 5f;
+    public float dashSpeed = 18f;
+    private int currentLane = 1;
 
-    // ∫∏Ω∫ ∞¯∞› ∆«¡§(»∏««)¿ª ¿ß«— « ºˆ º”º∫
+    [Header("Ï†êÌîÑ Î∞è Ïä¨ÎùºÏù¥Îî© ÏÑ§Ï†ï")]
+    public float jumpForce = 7f;
+    public bool shrinkVisualOnSlide = true;
+
     public bool IsJumping { get; private set; }
     public bool IsSliding { get; private set; }
 
     private Collider col;
-    public Bounds ColliderBounds
-    {
-        get { return col != null ? col.bounds : new Bounds(); }
-    }
+    public Bounds ColliderBounds => col != null ? col.bounds : new Bounds();
 
     private Rigidbody rb;
     private bool isGrounded = true;
+    private float startZ;
+
+    private Vector3 originalScale;
+    private BoxCollider boxCol;
+    private Vector3 originalBoxSize, originalBoxCenter;
+    private CapsuleCollider capsuleCol;
+    private float originalCapsuleHeight;
+    private Vector3 originalCapsuleCenter;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
         col = GetComponent<Collider>();
+
+        startZ = transform.position.z;
+        originalScale = transform.localScale;
+
+        boxCol = col as BoxCollider;
+        if (boxCol != null)
+        {
+            originalBoxSize = boxCol.size;
+            originalBoxCenter = boxCol.center;
+        }
+
+        capsuleCol = col as CapsuleCollider;
+        if (capsuleCol != null)
+        {
+            originalCapsuleHeight = capsuleCol.height;
+            originalCapsuleCenter = capsuleCol.center;
+        }
     }
 
     private void Start()
     {
         Time.timeScale = 1f;
+        currentLane = 1;
     }
 
     private void Update()
@@ -37,33 +62,66 @@ public class player : MonoBehaviour
         if (GameManager.Instance != null && (!GameManager.Instance.isPlaying || GameManager.Instance.isGameEnded))
             return;
 
-        // 1. ¡¬øÏ ¿‘∑¬ πﬁ±‚
-        float moveX = Input.GetAxisRaw("Horizontal");
+        // Ï¢åÏö∞ Ïù¥Îèô Î∞è Ìö®Í≥ºÏùå Ïû¨ÏÉù
+        if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
+        {
+            if (currentLane > 0)
+            {
+                currentLane--;
+                if (AudioManager.Instance != null) AudioManager.Instance.PlayMoveSound();
+            }
+        }
+        else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
+        {
+            if (currentLane < 2)
+            {
+                currentLane++;
+                if (AudioManager.Instance != null) AudioManager.Instance.PlayMoveSound();
+            }
+        }
 
-        // 2. ¡°«¡
-        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
+        if ((Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
+            && isGrounded && !IsSliding)
         {
             Jump();
         }
 
-        // 3. ΩΩ∂Û¿Ãµ˘ (æ∆∑° »≠ªÏ«•∏¶ ¥©∏£∞Ì ¿÷¥¬ µøæ»)
-        if (Input.GetKeyDown(KeyCode.DownArrow) && isGrounded)
+        if ((Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.S)) && isGrounded)
         {
-            IsSliding = true;
+            if (!IsSliding) StartSlide();
         }
-        if (Input.GetKeyUp(KeyCode.DownArrow))
+        else
         {
-            IsSliding = false;
+            if (IsSliding) StopSlide();
         }
 
-        // 4. ¿¸¡¯ ƒ⁄µÂ∏¶ æ¯æ÷∞Ì ¡¬øÏ ¿Ãµø∏∏ ¿˚øÎ
-        Vector3 move = Vector3.right * (moveX * sideSpeed);
-        transform.Translate(move * Time.deltaTime, Space.World);
-
-        // 5. µµ∑Œ π€¿∏∑Œ ≥™∞°¡ˆ æ ∞‘ X¡¬«• ¡¶«—
+        float targetX = (currentLane - 1) * laneDistance;
         Vector3 pos = transform.position;
-        pos.x = Mathf.Clamp(pos.x, -xLimit, xLimit);
+        pos.x = Mathf.Lerp(pos.x, targetX, Time.deltaTime * dashSpeed);
+
+        if (Mathf.Abs(pos.x - targetX) < 0.05f)
+        {
+            pos.x = targetX;
+        }
+
+        pos.z = startZ;
         transform.position = pos;
+    }
+
+    // ‚òÖ Ï∂îÍ∞Ä: AnimatorÍ∞Ä ÌÅ¨Í∏∞Î•º ÏõêÎûòÎåÄÎ°ú ÎêòÎèåÎ¶¨ÏßÄ Î™ªÌïòÎèÑÎ°ù Îß§ ÌîÑÎ†àÏûÑ ÎßàÏßÄÎßâÏóê ÏàôÏù¥Í∏∞ ÌÅ¨Í∏∞ Ïú†ÏßÄ
+    private void LateUpdate()
+    {
+        if (shrinkVisualOnSlide)
+        {
+            if (IsSliding)
+            {
+                transform.localScale = new Vector3(originalScale.x, originalScale.y * 0.5f, originalScale.z);
+            }
+            else
+            {
+                transform.localScale = originalScale;
+            }
+        }
     }
 
     private void Jump()
@@ -71,20 +129,93 @@ public class player : MonoBehaviour
         if (rb != null)
         {
             isGrounded = false;
-            IsJumping = true; // ¡°«¡ ªÛ≈¬ ƒ—±‚
+            IsJumping = true;
+            rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
             rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+
+            // Ï†êÌîÑ Ìö®Í≥ºÏùå Ïû¨ÏÉù
+            if (AudioManager.Instance != null)
+                AudioManager.Instance.PlayJumpSound();
+        }
+    }
+
+    private void StartSlide()
+    {
+        IsSliding = true;
+
+        // ÏõÖÌÅ¨Î¶¨Í∏∞(Ïä¨ÎùºÏù¥Îî©) Ìö®Í≥ºÏùå Ïû¨ÏÉù
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.PlaySlideSound();
+
+        if (boxCol != null)
+        {
+            boxCol.size = new Vector3(originalBoxSize.x, originalBoxSize.y * 0.45f, originalBoxSize.z);
+            boxCol.center = new Vector3(originalBoxCenter.x, originalBoxCenter.y - (originalBoxSize.y * 0.275f), originalBoxCenter.z);
+        }
+        else if (capsuleCol != null)
+        {
+            capsuleCol.height = originalCapsuleHeight * 0.45f;
+            capsuleCol.center = new Vector3(originalCapsuleCenter.x, originalCapsuleCenter.y - (originalCapsuleHeight * 0.275f), originalCapsuleCenter.z);
+        }
+
+        if (shrinkVisualOnSlide)
+        {
+            transform.localScale = new Vector3(originalScale.x, originalScale.y * 0.5f, originalScale.z);
+        }
+    }
+
+    private void StopSlide()
+    {
+        IsSliding = false;
+
+        if (boxCol != null)
+        {
+            boxCol.size = originalBoxSize;
+            boxCol.center = originalBoxCenter;
+        }
+        else if (capsuleCol != null)
+        {
+            capsuleCol.height = originalCapsuleHeight;
+            capsuleCol.center = originalCapsuleCenter;
+        }
+
+        if (shrinkVisualOnSlide)
+        {
+            transform.localScale = originalScale;
         }
     }
 
     private void OnCollisionEnter(Collision collision)
     {
-        isGrounded = true;
-        IsJumping = false; // ∂•ø° ¥Í¿∏∏È ¡°«¡ ªÛ≈¬ ≤Ù±‚
-
         if (collision.gameObject.CompareTag("Obstacle"))
         {
-            if (GameManager.Instance != null)
-                GameManager.Instance.TryUseShield();
+            Vector3 normal = collision.contacts[0].normal;
+
+            if (normal.y > 0.5f)
+            {
+                isGrounded = true;
+                IsJumping = false;
+            }
+            else
+            {
+                if (GameManager.Instance != null)
+                    GameManager.Instance.TryUseShield();
+
+                collision.collider.enabled = false;
+            }
+        }
+        else
+        {
+            isGrounded = true;
+            IsJumping = false;
+        }
+    }
+
+    private void OnCollisionStay(Collision collision)
+    {
+        if (collision.contacts.Length > 0 && collision.contacts[0].normal.y > 0.5f)
+        {
+            isGrounded = true;
         }
     }
 
@@ -94,6 +225,11 @@ public class player : MonoBehaviour
         {
             if (GameManager.Instance != null)
                 GameManager.Instance.AddCoin(1);
+
+            // ÏΩîÏù∏ ÌöçÎìù SFX Ïû¨ÏÉù
+            if (AudioManager.Instance != null)
+                AudioManager.Instance.PlayCoinSound();
+
             Destroy(other.gameObject);
         }
         else if (other.CompareTag("Shield"))
@@ -106,6 +242,7 @@ public class player : MonoBehaviour
         {
             if (GameManager.Instance != null)
                 GameManager.Instance.TryUseShield();
+            other.enabled = false;
         }
     }
 }
