@@ -12,6 +12,13 @@ public class GameManager : MonoBehaviour
     public int currentCoins = 0;
     public int shieldCount = 0;
 
+    [Header("목적지 (진행도) 설정")]
+    public int targetCoins = 500; // 목적지 도착을 위한 목표 코인 수
+
+    [Header("엔딩 씬 이름 설정")]
+    public string successSceneName = "success"; // 성공 시 넘어갈 씬 이름
+    public string failSceneName = "fail";       // 실패 시 넘어갈 씬 이름
+
     [Header("참조 변수")]
     public player playerRef;
 
@@ -39,6 +46,7 @@ public class GameManager : MonoBehaviour
         if (UIManager.Instance != null)
         {
             UIManager.Instance.UpdateHudUI(currentCoins, shieldCount);
+            UIManager.Instance.UpdateProgressUI(currentCoins, targetCoins);
         }
     }
 
@@ -47,12 +55,20 @@ public class GameManager : MonoBehaviour
         if (!isPlaying || isGameEnded) return;
 
         currentCoins += amount;
+
         if (UIManager.Instance != null)
         {
             UIManager.Instance.UpdateHudUI(currentCoins, shieldCount);
+            UIManager.Instance.UpdateProgressUI(currentCoins, targetCoins);
         }
 
         OnCoinUpdated?.Invoke(currentCoins, currentCoins);
+
+        // ★ 500개 꽉 채우면 성공 처리
+        if (currentCoins >= targetCoins)
+        {
+            GameClear();
+        }
     }
 
     public void AddShield(int amount = 1)
@@ -82,48 +98,67 @@ public class GameManager : MonoBehaviour
         return false;
     }
 
+    // ★ 실패 엔딩 (장애물 충돌)
     public void GameOver()
     {
         if (!isPlaying || isGameEnded) return;
         isPlaying = false;
         isGameEnded = true;
 
-        // ★ 게임오버 SFX 및 BGM 전환 연동
         if (AudioManager.Instance != null)
         {
             AudioManager.Instance.PlayGameOverSound();
             AudioManager.Instance.PlayBGM(AudioManager.Instance.endingBGM);
         }
 
-        OnGameEndedTriggered?.Invoke(false, "Game Over", 0, 0, 0);
-
         PlayerPrefs.SetInt("FinalCoin", currentCoins);
+        PlayerPrefs.SetInt("IsClear", 0);
         PlayerPrefs.Save();
 
         if (UIManager.Instance != null && UIManager.Instance.resultPanel != null)
         {
             Time.timeScale = 0f;
-            UIManager.Instance.ShowResultUI($"획득 코인: {currentCoins}");
+            UIManager.Instance.ShowResultUI($"모은 코인수 : {currentCoins}");
         }
         else
         {
-            SceneManager.LoadScene("ending");
+            // ★ 실패 씬으로 이동
+            SceneManager.LoadScene(failSceneName);
         }
     }
 
-    // BossBattleManager 연동 더미 함수들
-    public void SetCustomerSpawnEnabled(bool isEnabled, bool arg2)
+    // ★ 성공 엔딩 (목적지 도착)
+    public void GameClear()
     {
-        if (IntegratedSpawner.Instance != null)
-            IntegratedSpawner.Instance.isCustomerSpawnEnabled = isEnabled;
+        if (!isPlaying || isGameEnded) return;
+        isPlaying = false;
+        isGameEnded = true;
+
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlayGameClearSound();
+            AudioManager.Instance.PlayBGM(AudioManager.Instance.endingBGM);
+        }
+
+        PlayerPrefs.SetInt("FinalCoin", currentCoins);
+        PlayerPrefs.SetInt("IsClear", 1);
+        PlayerPrefs.Save();
+
+        if (UIManager.Instance != null && UIManager.Instance.resultPanel != null)
+        {
+            Time.timeScale = 0f;
+            UIManager.Instance.ShowResultUI($"모은 코인수 : {currentCoins}");
+        }
+        else
+        {
+            // ★ 성공 씬으로 이동
+            SceneManager.LoadScene(successSceneName);
+        }
     }
 
-    public void SetObstacleSpawnPaused(bool isPaused)
-    {
-        if (IntegratedSpawner.Instance != null)
-            IntegratedSpawner.Instance.isObstacleSpawnPaused = isPaused;
-    }
-
+    // 기타 연동 함수들
+    public void SetCustomerSpawnEnabled(bool isEnabled, bool arg2) { if (IntegratedSpawner.Instance != null) IntegratedSpawner.Instance.isCustomerSpawnEnabled = isEnabled; }
+    public void SetObstacleSpawnPaused(bool isPaused) { if (IntegratedSpawner.Instance != null) IntegratedSpawner.Instance.isObstacleSpawnPaused = isPaused; }
     public void DeductBossHit(int damage = 0) { }
     public void DeductBasicHit(int damage = 0) { }
     public void AddBossClearReward(int rewardAmount) { }

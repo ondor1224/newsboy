@@ -10,15 +10,20 @@ public class UIManager : MonoBehaviour
     [Header("씬 이동 설정")]
     public string gameSceneName = "playe";
     public string startSceneName = "start";
-    public string endingSceneName = "ending";
+    public string successSceneName = "success";
+    public string failSceneName = "fail";
 
     [Header("UI Panels")]
-    public GameObject titlePanel;
+    public GameObject titlePanel;     // ★ 시작화면 패널 (처음에 켜져있어야 함)
     public GameObject settingsPanel;
     public GameObject lobbyPanel;
     public GameObject shopPanel;
     public GameObject hudPanel;
     public GameObject resultPanel;
+
+    [Header("인트로 컷신 패널")]
+    public GameObject introPanel;     // ★ 만화 패널 (처음엔 꺼져있음)
+    public Image introComicImage;
 
     [Header("UI Texts & Sliders")]
     public Text hudCoinText;
@@ -26,6 +31,8 @@ public class UIManager : MonoBehaviour
     public Text lobbySavedCoinText;
     public Text shopStatusText;
     public Text resultSummaryText;
+
+    public Slider progressBar;
     public Slider bgmSlider;
     public Slider sfxSlider;
 
@@ -40,26 +47,26 @@ public class UIManager : MonoBehaviour
 
     private void Start()
     {
-        if (settingsPanel != null)
-            settingsPanel.SetActive(false);
-
         string currentScene = SceneManager.GetActiveScene().name;
 
-        // ★ 씬 시작 시 자동 BGM 재생
+        // ★ 시작 씬(start)일 때의 초기 설정
+        if (currentScene == startSceneName)
+        {
+            if (titlePanel != null) titlePanel.SetActive(true);   // 시작화면 켜기
+            if (introPanel != null) introPanel.SetActive(false); // 만화 패널은 무조건 숨기기!
+        }
+
+        if (settingsPanel != null) settingsPanel.SetActive(false);
+
+        // BGM 재생
         if (AudioManager.Instance != null)
         {
             if (currentScene == startSceneName)
-            {
                 AudioManager.Instance.PlayBGM(AudioManager.Instance.startBGM);
-            }
             else if (currentScene == gameSceneName)
-            {
                 AudioManager.Instance.PlayBGM(AudioManager.Instance.playBGM);
-            }
-            else if (currentScene == endingSceneName)
-            {
+            else if (currentScene == successSceneName || currentScene == failSceneName)
                 AudioManager.Instance.PlayBGM(AudioManager.Instance.endingBGM);
-            }
         }
 
         if (currentScene == gameSceneName)
@@ -68,18 +75,14 @@ public class UIManager : MonoBehaviour
             if (hudPanel != null) hudPanel.SetActive(true);
         }
 
-        if (currentScene == endingSceneName)
+        if (currentScene == successSceneName || currentScene == failSceneName)
         {
             int finalCoin = PlayerPrefs.GetInt("FinalCoin", 0);
-            if (resultSummaryText != null)
-            {
-                resultSummaryText.text = $"모은 코인수 : {finalCoin}";
-            }
+            if (resultSummaryText != null) resultSummaryText.text = $"모은 코인수 : {finalCoin}";
         }
     }
 
-    // ==================== 버튼 기능 & 효과음 ====================
-
+    // ================== 버튼 클릭 함수 ==================
     public void OnClickGoToStartScreen()
     {
         if (AudioManager.Instance != null) AudioManager.Instance.PlayButtonClick();
@@ -87,100 +90,46 @@ public class UIManager : MonoBehaviour
         SceneManager.LoadScene(startSceneName);
     }
 
+    // ★ 시작 버튼을 눌렀을 때만 실행되는 로직
     public void OnClickStart()
+    {
+        if (AudioManager.Instance != null) AudioManager.Instance.PlayButtonClick();
+
+        if (introPanel != null)
+        {
+            if (titlePanel != null) titlePanel.SetActive(false); // 시작화면 끄고!
+            introPanel.SetActive(true);                          // 이제야 만화 화면 켜기!
+
+            // 이미지 알파값(불투명도) 1로 고정
+            if (introComicImage != null)
+            {
+                Color c = introComicImage.color;
+                c.a = 1f;
+                introComicImage.color = c;
+            }
+
+            // 3초 뒤 진짜 시작
+            Invoke("OnClickRealStart", 3f);
+        }
+        else
+        {
+            Time.timeScale = 1f;
+            SceneManager.LoadScene(gameSceneName);
+        }
+    }
+
+    public void OnClickRealStart()
     {
         if (AudioManager.Instance != null) AudioManager.Instance.PlayButtonClick();
         Time.timeScale = 1f;
         SceneManager.LoadScene(gameSceneName);
     }
 
-    public void OnClickSettings()
-    {
-        if (AudioManager.Instance != null) AudioManager.Instance.PlayButtonClick();
-        if (settingsPanel != null)
-            settingsPanel.SetActive(!settingsPanel.activeSelf);
-    }
+    public void OnClickSettings() { if (settingsPanel != null) settingsPanel.SetActive(!settingsPanel.activeSelf); }
+    public void OnClickCloseSettings() { if (settingsPanel != null) settingsPanel.SetActive(false); }
+    public void OnClickQuit() { Application.Quit(); }
 
-    public void OnClickCloseSettings()
-    {
-        if (AudioManager.Instance != null) AudioManager.Instance.PlayButtonClick();
-        if (settingsPanel != null)
-            settingsPanel.SetActive(false);
-    }
-
-    public void OnClickQuit()
-    {
-        if (AudioManager.Instance != null) AudioManager.Instance.PlayButtonClick();
-#if UNITY_EDITOR
-        UnityEditor.EditorApplication.isPlaying = false;
-#else
-        Application.Quit();
-#endif
-    }
-
-    // ==================== 배경음 / 효과음 토글 ====================
-
-    public void OnClickToggleBgm()
-    {
-        if (AudioManager.Instance != null) AudioManager.Instance.PlayButtonClick();
-        isBgmOn = !isBgmOn;
-        if (AudioManager.Instance != null) AudioManager.Instance.SetBGMActive(isBgmOn);
-
-        string targetText = isBgmOn ? "배경음 킴" : "배경음 끔";
-        ChangeButtonTextOrChild(targetText, isBgmOn, "Music_on", "Music_off");
-    }
-
-    public void OnClickToggleSfx()
-    {
-        if (AudioManager.Instance != null) AudioManager.Instance.PlayButtonClick();
-        isSfxOn = !isSfxOn;
-        if (AudioManager.Instance != null) AudioManager.Instance.SetSFXActive(isSfxOn);
-
-        string targetText = isSfxOn ? "효과음 킴" : "효과음 끔";
-        ChangeButtonTextOrChild(targetText, isSfxOn, "Musec_j_on", "Musec_j_off");
-    }
-
-    private void ChangeButtonTextOrChild(string newText, bool isOn, string onObjName, string offObjName)
-    {
-        GameObject clickedBtn = EventSystem.current.currentSelectedGameObject;
-        if (clickedBtn == null) return;
-
-        Text uiText = clickedBtn.GetComponentInChildren<Text>(true);
-        if (uiText != null)
-        {
-            uiText.text = newText;
-        }
-
-        Component[] allComponents = clickedBtn.GetComponentsInChildren<Component>(true);
-        foreach (Component comp in allComponents)
-        {
-            if (comp != null && comp.GetType().Name.Contains("TextMeshPro"))
-            {
-                var textProp = comp.GetType().GetProperty("text");
-                if (textProp != null) textProp.SetValue(comp, newText, null);
-            }
-        }
-
-        Transform onChild = clickedBtn.transform.Find(onObjName);
-        Transform offChild = clickedBtn.transform.Find(offObjName);
-        if (onChild != null && offChild != null)
-        {
-            onChild.gameObject.SetActive(isOn);
-            offChild.gameObject.SetActive(!isOn);
-        }
-    }
-
-    // ==================== HUD / 결과 UI 업데이트 ====================
-
-    public void UpdateHudUI(int coin, int shield)
-    {
-        if (hudCoinText != null) hudCoinText.text = $"코인: {coin}";
-        if (hudShieldText != null) hudShieldText.text = $"방어막: {shield}";
-    }
-
-    public void ShowResultUI(string summary)
-    {
-        if (resultPanel != null) resultPanel.SetActive(true);
-        if (resultSummaryText != null) resultSummaryText.text = summary;
-    }
+    public void UpdateHudUI(int coin, int shield) { if (hudCoinText != null) hudCoinText.text = $"코인: {coin}"; if (hudShieldText != null) hudShieldText.text = $"방어막: {shield}"; }
+    public void UpdateProgressUI(int currentCoin, int maxCoin) { if (progressBar != null && maxCoin > 0) progressBar.value = Mathf.Clamp01((float)currentCoin / maxCoin); }
+    public void ShowResultUI(string summary) { if (resultPanel != null) resultPanel.SetActive(true); if (resultSummaryText != null) resultSummaryText.text = summary; }
 }

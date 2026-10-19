@@ -2,12 +2,12 @@ using UnityEngine;
 
 public class player : MonoBehaviour
 {
-    [Header("차선 대쉬 이동 설정 (-5, 0, 5)")]
+    [Header("���� �뽬 �̵� ���� (-5, 0, 5)")]
     public float laneDistance = 5f;
     public float dashSpeed = 18f;
     private int currentLane = 1;
 
-    [Header("점프 및 슬라이딩 설정")]
+    [Header("���� �� �����̵� ����")]
     public float jumpForce = 7f;
     public bool shrinkVisualOnSlide = true;
 
@@ -62,22 +62,13 @@ public class player : MonoBehaviour
         if (GameManager.Instance != null && (!GameManager.Instance.isPlaying || GameManager.Instance.isGameEnded))
             return;
 
-        // 좌우 이동 및 효과음 재생
         if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
         {
-            if (currentLane > 0)
-            {
-                currentLane--;
-                if (AudioManager.Instance != null) AudioManager.Instance.PlayMoveSound();
-            }
+            if (currentLane > 0) currentLane--;
         }
         else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
         {
-            if (currentLane < 2)
-            {
-                currentLane++;
-                if (AudioManager.Instance != null) AudioManager.Instance.PlayMoveSound();
-            }
+            if (currentLane < 2) currentLane++;
         }
 
         if ((Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
@@ -108,22 +99,6 @@ public class player : MonoBehaviour
         transform.position = pos;
     }
 
-    // ★ 추가: Animator가 크기를 원래대로 되돌리지 못하도록 매 프레임 마지막에 숙이기 크기 유지
-    private void LateUpdate()
-    {
-        if (shrinkVisualOnSlide)
-        {
-            if (IsSliding)
-            {
-                transform.localScale = new Vector3(originalScale.x, originalScale.y * 0.5f, originalScale.z);
-            }
-            else
-            {
-                transform.localScale = originalScale;
-            }
-        }
-    }
-
     private void Jump()
     {
         if (rb != null)
@@ -132,20 +107,12 @@ public class player : MonoBehaviour
             IsJumping = true;
             rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
             rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
-
-            // 점프 효과음 재생
-            if (AudioManager.Instance != null)
-                AudioManager.Instance.PlayJumpSound();
         }
     }
 
     private void StartSlide()
     {
         IsSliding = true;
-
-        // 웅크리기(슬라이딩) 효과음 재생
-        if (AudioManager.Instance != null)
-            AudioManager.Instance.PlaySlideSound();
 
         if (boxCol != null)
         {
@@ -226,7 +193,6 @@ public class player : MonoBehaviour
             if (GameManager.Instance != null)
                 GameManager.Instance.AddCoin(1);
 
-            // 코인 획득 SFX 재생
             if (AudioManager.Instance != null)
                 AudioManager.Instance.PlayCoinSound();
 
