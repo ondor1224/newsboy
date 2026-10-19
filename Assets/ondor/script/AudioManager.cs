@@ -19,6 +19,12 @@ public class AudioManager : MonoBehaviour
     public AudioClip gameOverSFX;   // 게임 오버(실패)
     public AudioClip gameClearSFX;  // 배달 완료(성공)
 
+    // ★ 추가된 캐릭터 움직임 효과음
+    [Header("Player Movement SFX")]
+    public AudioClip jumpSFX;       // 점프
+    public AudioClip slideSFX;      // 웅크리기(슬라이드)
+    public AudioClip moveSFX;       // 옆으로 이동
+
     public bool IsBgmOn { get; private set; } = true;
     public bool IsSfxOn { get; private set; } = true;
 
@@ -68,4 +74,9 @@ public class AudioManager : MonoBehaviour
     public void PlayCoinSound() => PlaySFX(coinSFX);
     public void PlayGameOverSound() => PlaySFX(gameOverSFX);
     public void PlayGameClearSound() => PlaySFX(gameClearSFX);
+
+    // ★ 추가된 캐릭터 움직임 효과음 재생 함수
+    public void PlayJumpSound() => PlaySFX(jumpSFX);
+    public void PlaySlideSound() => PlaySFX(slideSFX);
+    public void PlayMoveSound() => PlaySFX(moveSFX);
 }

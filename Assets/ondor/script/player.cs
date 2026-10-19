@@ -11,6 +11,9 @@ public class player : MonoBehaviour
     public float jumpForce = 7f;
     public bool shrinkVisualOnSlide = true;
 
+    // ★ 치트용 무적 상태 변수 추가
+    public bool isInvincible = false;
+
     public bool IsJumping { get; private set; }
     public bool IsSliding { get; private set; }
 
@@ -55,6 +58,7 @@ public class player : MonoBehaviour
     {
         Time.timeScale = 1f;
         currentLane = 1;
+        isInvincible = false; // 시작할 땐 무적 끄기
     }
 
     private void Update()
@@ -62,13 +66,44 @@ public class player : MonoBehaviour
         if (GameManager.Instance != null && (!GameManager.Instance.isPlaying || GameManager.Instance.isGameEnded))
             return;
 
+        // ================== [치트키 발동] ==================
+        // 키보드 C를 누르면 코인 100개 추가!
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            if (GameManager.Instance != null)
+            {
+                for (int i = 0; i < 100; i++)
+                {
+                    GameManager.Instance.AddCoin(1);
+                }
+                if (AudioManager.Instance != null) AudioManager.Instance.PlayCoinSound();
+                Debug.Log("치트 발동! 코인 +100");
+            }
+        }
+
+        // 키보드 V를 누르면 무적 모드 ON/OFF!
+        if (Input.GetKeyDown(KeyCode.V))
+        {
+            isInvincible = !isInvincible;
+            Debug.Log("치트 발동! 무적 모드: " + (isInvincible ? "ON" : "OFF"));
+        }
+        // ===================================================
+
         if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
         {
-            if (currentLane > 0) currentLane--;
+            if (currentLane > 0)
+            {
+                currentLane--;
+                if (AudioManager.Instance != null) AudioManager.Instance.PlayMoveSound();
+            }
         }
         else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
         {
-            if (currentLane < 2) currentLane++;
+            if (currentLane < 2)
+            {
+                currentLane++;
+                if (AudioManager.Instance != null) AudioManager.Instance.PlayMoveSound();
+            }
         }
 
         if ((Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
@@ -107,12 +142,16 @@ public class player : MonoBehaviour
             IsJumping = true;
             rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
             rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+
+            if (AudioManager.Instance != null) AudioManager.Instance.PlayJumpSound();
         }
     }
 
     private void StartSlide()
     {
         IsSliding = true;
+
+        if (AudioManager.Instance != null) AudioManager.Instance.PlaySlideSound();
 
         if (boxCol != null)
         {
@@ -165,8 +204,12 @@ public class player : MonoBehaviour
             }
             else
             {
-                if (GameManager.Instance != null)
-                    GameManager.Instance.TryUseShield();
+                // ★ 무적 모드가 아닐 때만 게임 오버(또는 실드 사용) 처리
+                if (!isInvincible)
+                {
+                    if (GameManager.Instance != null)
+                        GameManager.Instance.TryUseShield(); // 방어막이 없으므로 바로 GameOver 됨
+                }
 
                 collision.collider.enabled = false;
             }
@@ -198,16 +241,14 @@ public class player : MonoBehaviour
 
             Destroy(other.gameObject);
         }
-        else if (other.CompareTag("Shield"))
-        {
-            if (GameManager.Instance != null)
-                GameManager.Instance.AddShield(1);
-            Destroy(other.gameObject);
-        }
         else if (other.CompareTag("Obstacle"))
         {
-            if (GameManager.Instance != null)
-                GameManager.Instance.TryUseShield();
+            // ★ 무적 모드가 아닐 때만 게임 오버 처리
+            if (!isInvincible)
+            {
+                if (GameManager.Instance != null)
+                    GameManager.Instance.TryUseShield(); // 방어막이 없으므로 바로 GameOver 됨
+            }
             other.enabled = false;
         }
     }

@@ -353,6 +353,9 @@ MonoBehaviour:
   coinSFX: {fileID: 8300000, guid: 12d34b012ef3e024cbb08e9b7c5cf5ff, type: 3}
   gameOverSFX: {fileID: 8300000, guid: 9979d2fc9fc49a64cae653d594436f12, type: 3}
   gameClearSFX: {fileID: 0}
+  jumpSFX: {fileID: 8300000, guid: 7fbaf05715714a643b5658e272ab5082, type: 3}
+  slideSFX: {fileID: 8300000, guid: d9eec1984b8311d40a8927b812d5ba3f, type: 3}
+  moveSFX: {fileID: 8300000, guid: cf6ed08e61453e345954b9ffe06f5a4c, type: 3}
 --- !u!4 &338628198
 Transform:
   m_ObjectHideFlags: 0

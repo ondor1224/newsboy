@@ -160,11 +160,11 @@ MonoBehaviour:
   resultPanel: {fileID: 0}
   introPanel: {fileID: 0}
   introComicImage: {fileID: 0}
-  hudCoinText: {fileID: 1559441396}
+  hudCoinText: {fileID: 0}
   hudShieldText: {fileID: 0}
   lobbySavedCoinText: {fileID: 0}
   shopStatusText: {fileID: 0}
-  resultSummaryText: {fileID: 0}
+  resultSummaryText: {fileID: 1559441396}
   progressBar: {fileID: 0}
   bgmSlider: {fileID: 0}
   sfxSlider: {fileID: 0}
@@ -216,7 +216,6 @@ RectTransform:
   - {fileID: 1590953533}
   - {fileID: 1559441395}
   - {fileID: 1078983702}
-  - {fileID: 779279267}
   m_Father: {fileID: 400215261}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
@@ -441,85 +440,6 @@ CanvasRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 400215260}
-  m_CullTransparentMesh: 1
---- !u!1 &779279266
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 779279267}
-  - component: {fileID: 779279269}
-  - component: {fileID: 779279268}
-  m_Layer: 5
-  m_Name: Text (Legacy)
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &779279267
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 779279266}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.2, y: 0.97435, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 244414728}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.000011444092, y: 78}
-  m_SizeDelta: {x: 752.229, y: 99.2107}
-  m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &779279268
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 779279266}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Text
-  m_Material: {fileID: 0}
-  m_Color: {r: 0.21698111, g: 0.21698111, b: 0.21698111, a: 1}
-  m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_FontData:
-    m_Font: {fileID: 12800000, guid: 6ade1bbec6bcbd44f858488cd3ff7e7e, type: 3}
-    m_FontSize: 50
-    m_FontStyle: 1
-    m_BestFit: 0
-    m_MinSize: 0
-    m_MaxSize: 100
-    m_Alignment: 4
-    m_AlignByGeometry: 0
-    m_RichText: 1
-    m_HorizontalOverflow: 0
-    m_VerticalOverflow: 0
-    m_LineSpacing: 1
-  m_Text: "\uD73C\uB96D\uD558\uAC8C \uC798 \uC804\uB2EC\uD558\uC600\uC2B5\uB2C8\uB2E4. "
---- !u!222 &779279269
-CanvasRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 779279266}
   m_CullTransparentMesh: 1
 --- !u!1 &930241784
 GameObject:
